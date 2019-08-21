@@ -142,7 +142,7 @@ var structDescs_amd64 = []*KeyedStruct{
 	{Key: StructKey{Name: "cmsghdr_un_cred"}, Desc: &StructDesc{TypeCommon: TypeCommon{TypeName: "cmsghdr_un_cred", TypeSize: 32}, Fields: []Type{
 		&LenType{IntTypeCommon: IntTypeCommon{TypeCommon: TypeCommon{TypeName: "len", FldName: "len", TypeSize: 8}}, Path: []string{"parent"}},
 		&ConstType{IntTypeCommon: IntTypeCommon{TypeCommon: TypeCommon{TypeName: "const", FldName: "level", TypeSize: 4}}, Val: 65535},
-		&ConstType{IntTypeCommon: IntTypeCommon{TypeCommon: TypeCommon{TypeName: "const", FldName: "type", TypeSize: 4}}, Val: 2},
+		&ConstType{IntTypeCommon: IntTypeCommon{TypeCommon: TypeCommon{TypeName: "const", FldName: "type", TypeSize: 4}}, Val: 3},
 		&ResourceType{TypeCommon: TypeCommon{TypeName: "pid", FldName: "pid", TypeSize: 4}},
 		&ResourceType{TypeCommon: TypeCommon{TypeName: "uid", FldName: "uid", TypeSize: 4}},
 		&ResourceType{TypeCommon: TypeCommon{TypeName: "gid", FldName: "gid", TypeSize: 4}},
@@ -5255,7 +5255,6 @@ var consts_amd64 = []ConstValue{
 	{Name: "ITIMER_PROF", Value: 2},
 	{Name: "ITIMER_REAL"},
 	{Name: "ITIMER_VIRTUAL", Value: 1},
-	{Name: "LINUX_SCM_CREDENTIALS", Value: 2},
 	{Name: "LOCK_EX", Value: 2},
 	{Name: "LOCK_NB", Value: 4},
 	{Name: "LOCK_SH", Value: 1},
@@ -5359,6 +5358,7 @@ var consts_amd64 = []ConstValue{
 	{Name: "RUSAGE_CHILDREN", Value: 18446744073709551615},
 	{Name: "RUSAGE_SELF"},
 	{Name: "RUSAGE_THREAD", Value: 1},
+	{Name: "SCM_CREDS", Value: 3},
 	{Name: "SCM_RIGHTS", Value: 1},
 	{Name: "SCTP_ABORT", Value: 512},
 	{Name: "SCTP_ADAPTATION_INDICATION", Value: 6},
@@ -5715,4 +5715,4 @@ var consts_amd64 = []ConstValue{
 	{Name: "WUNTRACED", Value: 2},
 }
 
-const revision_amd64 = "8a3bca2af862d54553a68c1871a0802a78b1f5e2"
+const revision_amd64 = "05d511b4f1f7cea13a50889e0292acef31303fe1"

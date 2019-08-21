@@ -26,6 +26,10 @@ var (
 )
 
 func init() {
+	// XXX-AM: Hardcoded because the -X flag does not appear to work
+	GitRevision = "732bc5a0a4cc7468b8abfdf8ba14f349f6d8acfa+"
+	gitRevisionDate = "Thu Jul 25 16:31:25 2019 +0200"
+
 	GitRevisionBase = strings.Replace(GitRevision, "+", "", -1)
 	if gitRevisionDate != "" {
 		var err error

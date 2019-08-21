@@ -181,6 +181,7 @@ var List = map[string]map[string]*Target{
 			CFlags:            []string{"-m64"},
 			CrossCFlags:       []string{"-m64", "-static"},
 			NeedSyscallDefine: dontNeedSyscallDefine,
+			KernelHeaderArch:  "amd64",
 		},
 		"386": {
 			VMArch:   "amd64",
@@ -191,6 +192,15 @@ var List = map[string]map[string]*Target{
 			// For context see discussion in https://github.com/google/syzkaller/pull/1202
 			CrossCFlags:       []string{"-m32", "-static", "-B/usr/lib32"},
 			NeedSyscallDefine: dontNeedSyscallDefine,
+			KernelHeaderArch:  "amd64",
+		},
+		"mips64": {
+			PtrSize:           8,
+			PageSize:          4 << 10,
+			CFlags:            []string{"-target amd64-unknown-freebsd"},
+			NeedSyscallDefine: dontNeedSyscallDefine,
+			CCompiler:         "clang++",
+			KernelHeaderArch:  "mips",
 		},
 	},
 	"netbsd": {

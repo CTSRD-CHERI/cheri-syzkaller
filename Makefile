@@ -62,7 +62,7 @@ GITREVDATE=$(shell git log -n 1 --format="%ad")
 # Reduces build time and binary sizes considerably.
 # That's only needed if you use gdb or nm.
 # If you need that, build manually without these flags.
-GOFLAGS := "-ldflags=-s -w -X github.com/google/syzkaller/sys.GitRevision=$(REV) -X 'github.com/google/syzkaller/sys.gitRevisionDate=$(GITREVDATE)'"
+GOFLAGS := "-ldflags=-s -w -X 'github.com/google/syzkaller/sys.GitRevision=$(REV)' -X 'github.com/google/syzkaller/sys.gitRevisionDate=$(GITREVDATE)'"
 
 GOHOSTFLAGS := $(GOFLAGS)
 GOTARGETFLAGS := $(GOFLAGS)
@@ -84,6 +84,11 @@ endif
 ifeq ("$(TARGETOS)", "trusty")
 	TARGETGOOS := $(HOSTOS)
 	TARGETGOARCH := $(HOSTARCH)
+endif
+
+ifeq ("$(TARGETARCH)", "mips64")
+	export GOMIPS=softfloat
+	export GOMIPS64=softfloat
 endif
 
 .PHONY: all host target \
@@ -245,7 +250,7 @@ arch: arch_darwin_amd64_host arch_linux_amd64_host arch_freebsd_amd64_host \
 	arch_netbsd_amd64_host arch_openbsd_amd64_host \
 	arch_linux_amd64_target arch_linux_386_target \
 	arch_linux_arm64_target arch_linux_arm_target arch_linux_ppc64le_target \
-	arch_freebsd_amd64_target arch_freebsd_386_target \
+	arch_freebsd_amd64_target arch_freebsd_386_target arch_freebsd_mips64_target \
 	arch_netbsd_amd64_target arch_openbsd_amd64_target \
 	arch_windows_amd64_target arch_test
 
@@ -278,6 +283,9 @@ arch_freebsd_amd64_target:
 
 arch_freebsd_386_target:
 	env TARGETOS=freebsd TARGETARCH=386 $(MAKE) target
+
+arch_freebsd_mips64_target:
+	env TARGETOS=freebsd TARGETARCH=mips64 $(MAKE) target
 
 arch_netbsd_amd64_host:
 	env HOSTOS=netbsd HOSTARCH=amd64 $(MAKE) host

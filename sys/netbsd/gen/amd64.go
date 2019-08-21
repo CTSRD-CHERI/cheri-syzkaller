@@ -1810,4 +1810,4 @@ var consts_amd64 = []ConstValue{
 	{Name: "_UC_STACK", Value: 2},
 }
 
-const revision_amd64 = "65d5b75dae9655ed21ef93383407c6108cf4de62"
+const revision_amd64 = "b99eb7a862118188b21de6ed6ffc883b55b1bac3"

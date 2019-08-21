@@ -149,6 +149,12 @@ var archConfigs = map[string]*archConfig{
 		QemuArgs:  "-enable-kvm",
 		NicModel:  ",model=e1000",
 	},
+	"freebsd/mips64": {
+		Qemu:      "qemu-system-mips",
+		TargetDir: "/",
+		QemuArgs:  "",
+		NicModel:  ",model=e1000",
+	},
 	"netbsd/amd64": {
 		Qemu:      "qemu-system-x86_64",
 		TargetDir: "/",

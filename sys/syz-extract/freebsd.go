@@ -25,18 +25,27 @@ func (*freebsd) prepare(sourcedir string, build bool, arches []string) error {
 }
 
 func (*freebsd) prepareArch(arch *Arch) error {
-	if err := os.Symlink(filepath.Join(arch.sourceDir, "sys", "amd64", "include"),
+	headerArch := arch.target.KernelHeaderArch
+	if err := os.Symlink(filepath.Join(arch.sourceDir, "sys", headerArch, "include"),
 		filepath.Join(arch.buildDir, "machine")); err != nil {
 		return fmt.Errorf("failed to create link: %v", err)
 	}
-	if err := os.Symlink(filepath.Join(arch.sourceDir, "sys", "x86", "include"),
-		filepath.Join(arch.buildDir, "x86")); err != nil {
+	// Also add the x86 headers because we need them.
+	if headerArch == "amd64" {
+		if err := os.Symlink(filepath.Join(arch.sourceDir, "sys", "x86", "include"),
+			filepath.Join(arch.buildDir, "x86")); err != nil {
+			return fmt.Errorf("failed to create link: %v", err)
+		}
+	}
+	if err := os.Symlink(filepath.Join(arch.sourceDir, "sys", headerArch, "linux"),
+		filepath.Join(arch.buildDir, "linux")); err != nil {
 		return fmt.Errorf("failed to create link: %v", err)
 	}
 	return nil
 }
 
 func (*freebsd) processFile(arch *Arch, info *compiler.ConstInfo) (map[string]uint64, map[string]bool, error) {
+	headerArch := arch.target.KernelHeaderArch
 	args := []string{
 		"-fmessage-length=0",
 		"-nostdinc",
@@ -45,9 +54,10 @@ func (*freebsd) processFile(arch *Arch, info *compiler.ConstInfo) (map[string]ui
 		"-D__BSD_VISIBLE=1",
 		"-I", filepath.Join(arch.sourceDir, "sys"),
 		"-I", filepath.Join(arch.sourceDir, "sys", "sys"),
-		"-I", filepath.Join(arch.sourceDir, "sys", "amd64"),
+		"-I", filepath.Join(arch.sourceDir, "sys", headerArch),
 		"-I", arch.buildDir,
 	}
+
 	for _, incdir := range info.Incdirs {
 		args = append(args, "-I"+filepath.Join(arch.sourceDir, incdir))
 	}
@@ -56,5 +66,6 @@ func (*freebsd) processFile(arch *Arch, info *compiler.ConstInfo) (map[string]ui
 			args = append(args, "-I"+dir)
 		}
 	}
-	return extract(info, "gcc", args, "#include <sys/syscall.h>", true, false)
+
+	return extract(info, "clang", args, "#include <sys/syscall.h>", true, false)
 }

@@ -120,4 +120,4 @@ var consts_32_fork_shmem = []ConstValue{
 	{Name: "ONLY_32BITS_CONST", Value: 1},
 }
 
-const revision_32_fork_shmem = "c1820da1fd3d10373aa40011a453b7479b078078"
+const revision_32_fork_shmem = "dd54531dcc88f8c6586679ccecea22eddbf5c896"
