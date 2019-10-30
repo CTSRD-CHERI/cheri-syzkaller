@@ -47,6 +47,7 @@ type Config struct {
 	CPU         int    `json:"cpu"`      // number of VM CPUs
 	Mem         int    `json:"mem"`      // amount of VM memory in MiB
 	Snapshot    bool   `json:"snapshot"` // For building kernels without -snapshot (for pkg/build)
+	Timeout     int    `json:"timeout"`  // SSH connection timeout
 }
 
 type Pool struct {
@@ -202,6 +203,7 @@ func ctor(env *vmimpl.Env) (vmimpl.Pool, error) {
 		Qemu:        archConfig.Qemu,
 		QemuArgs:    archConfig.QemuArgs,
 		Snapshot:    true,
+		Timeout:     10,
 	}
 	if err := config.LoadData(env.Config, cfg); err != nil {
 		return nil, fmt.Errorf("failed to parse qemu vm config: %v", err)
@@ -422,7 +424,7 @@ func (inst *instance) boot() error {
 			}
 		}
 	}()
-	if err := vmimpl.WaitForSSH(inst.debug, 10*time.Minute, "localhost",
+	if err := vmimpl.WaitForSSH(inst.debug, time.Duration(inst.cfg.Timeout)*time.Minute, "localhost",
 		inst.sshkey, inst.sshuser, inst.os, inst.port, inst.merger.Err); err != nil {
 		bootOutputStop <- true
 		<-bootOutputStop
