@@ -1,0 +1,23 @@
+// Template syzkaller configuration file for qemu-cheribsd kernel with hybrid userspace
+{
+    "name": "cheribsd-n64",
+    "target": "freebsd/mips64",
+    "http": ":10000",
+    "workdir": "{{ syzkaller_workdir }}",
+    "syzkaller": "{{ syzkaller_root }}",
+    "sshkey": "{{ syzkaller_id_rsa }}",
+    "sandbox": "none",
+    "procs": 1,
+    "image": "{{ syzkaller_disk_image }}",
+    "type": "qemu",
+    "vm": {
+	"qemu": "{{ syzkaller_cheri_qemu_bin }}",
+	"qemu_args": "-M malta -device virtio-rng-pci",
+	"kernel": "{{ syzkaller_cheri_kernel }}",
+	"image_device": "drive index=0,media=disk,format=raw,file=",
+	"count": 1,
+	"cpu": 1,
+	"mem": 2048,
+	"timeout": 30
+    }
+}
