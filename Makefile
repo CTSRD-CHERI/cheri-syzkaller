@@ -92,7 +92,7 @@ ifeq ("$(TARGETARCH)", "mips64")
 endif
 
 .PHONY: all host target \
-	manager runtest fuzzer executor \
+	manager runtest fuzzer executor kcovtrace\
 	ci hub \
 	execprog mutate prog2c trace2syz stress repro upgrade db \
 	bin/syz-sysgen bin/syz-extract bin/syz-fmt \
@@ -115,7 +115,7 @@ host:
 
 target:
 	GOOS=$(TARGETGOOS) GOARCH=$(TARGETGOARCH) $(GO) install ./syz-fuzzer
-	$(MAKE) fuzzer execprog stress executor
+	$(MAKE) fuzzer execprog stress executor kcovtrace
 
 # executor uses stacks of limited size, so no jumbo frames.
 executor:
@@ -130,7 +130,26 @@ ifneq ("$(NO_CROSS_COMPILER)", "")
 	$(info ************************************************************************************)
 else
 	mkdir -p ./bin/$(TARGETOS)_$(TARGETARCH)
-	$(CC) -o ./bin/$(TARGETOS)_$(TARGETARCH)/syz-executor$(EXE) executor/executor.cc \
+	$(CXX) -o ./bin/$(TARGETOS)_$(TARGETARCH)/syz-executor$(EXE) executor/executor.cc \
+		$(ADDCFLAGS) $(CFLAGS) -DGOOS_$(TARGETOS)=1 -DGOARCH_$(TARGETARCH)=1 \
+		-DHOSTGOOS_$(HOSTOS)=1 -DGIT_REVISION=\"$(REV)\"
+endif
+endif
+
+kcovtrace:
+ifneq ("$(BUILDOS)", "$(NATIVEBUILDOS)")
+	$(info ************************************************************************************)
+	$(info Building kcovtrace for ${TARGETOS} is not supported on ${BUILDOS}. KCovtrace will not be built.)
+	$(info ************************************************************************************)
+else
+ifneq ("$(NO_CROSS_COMPILER)", "")
+	$(info ************************************************************************************)
+	$(info Native cross-compiler $(CC) is missing. KCovtrace will not be built.)
+	$(info ************************************************************************************)
+else
+	mkdir -p ./bin/$(TARGETOS)_$(TARGETARCH)
+	echo $(CC)
+	$(CC) -o ./bin/$(TARGETOS)_$(TARGETARCH)/syz-kcovtrace$(EXE) tools/kcovtrace/kcovtrace.c \
 		$(ADDCFLAGS) $(CFLAGS) -DGOOS_$(TARGETOS)=1 -DGOARCH_$(TARGETARCH)=1 \
 		-DHOSTGOOS_$(HOSTOS)=1 -DGIT_REVISION=\"$(REV)\"
 endif
@@ -241,7 +260,7 @@ tidy:
 		-extra-arg=-DGOOS_$(TARGETOS)=1 -extra-arg=-DGOARCH_$(TARGETARCH)=1 \
 		executor/*.cc
 	# Just check for compiler warnings.
-	$(CC) executor/test_executor.cc -c -o /dev/null -Wparentheses -Wno-unused -Wall
+	$(CXX) executor/test_executor.cc -c -o /dev/null -Wparentheses -Wno-unused -Wall
 
 lint:
 	golangci-lint run ./...

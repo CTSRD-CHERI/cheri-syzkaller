@@ -199,7 +199,7 @@ var List = map[string]map[string]*Target{
 			PageSize:          4 << 10,
 			CFlags:            []string{"-target amd64-unknown-freebsd"},
 			NeedSyscallDefine: dontNeedSyscallDefine,
-			CCompiler:         "clang++",
+			CCompiler:         os.ExpandEnv("${CC}"),
 			KernelHeaderArch:  "mips",
 		},
 	},
