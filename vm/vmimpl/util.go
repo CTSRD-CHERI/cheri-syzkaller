@@ -28,10 +28,10 @@ func WaitForSSH(debug bool, timeout time.Duration, addr, sshKey, sshUser, OS str
 		pwd = "dir"
 	}
 	startTime := time.Now()
-	SleepInterruptible(5 * time.Second)
+	SleepInterruptible(5 * time.Minute)
 	for {
 		select {
-		case <-time.After(5 * time.Second):
+		case <-time.After(2 * time.Minute):
 		case err := <-stop:
 			return err
 		case <-Shutdown:
@@ -70,7 +70,7 @@ func sshArgs(debug bool, sshKey, portArg string, port int) []string {
 		"-o", "BatchMode=yes",
 		"-o", "IdentitiesOnly=yes",
 		"-o", "StrictHostKeyChecking=no",
-		"-o", "ConnectTimeout=10",
+		"-o", "ConnectTimeout=60",
 	}
 	if sshKey != "" {
 		args = append(args, "-i", sshKey)

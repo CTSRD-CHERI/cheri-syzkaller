@@ -1,4 +1,3 @@
-// Template syzkaller configuration file for qemu-cheribsd kernel with hybrid userspace
 {
     "name": "cheribsd-n64",
     "target": "freebsd/mips64",
@@ -18,6 +17,6 @@
 	"count": 1,
 	"cpu": 1,
 	"mem": 2048,
-	"timeout": 30
+	"timeout": 60
     }
 }

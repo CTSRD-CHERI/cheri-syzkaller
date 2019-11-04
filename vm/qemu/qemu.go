@@ -47,7 +47,7 @@ type Config struct {
 	CPU         int    `json:"cpu"`      // number of VM CPUs
 	Mem         int    `json:"mem"`      // amount of VM memory in MiB
 	Snapshot    bool   `json:"snapshot"` // For building kernels without -snapshot (for pkg/build)
-	Timeout     int    `json:"timeout"`  // SSH connection timeout
+	Timeout     int    `json:"timeout"`  // SSH connection timeout (minutes)
 }
 
 type Pool struct {
@@ -154,7 +154,7 @@ var archConfigs = map[string]*archConfig{
 		Qemu:      "qemu-system-mips",
 		TargetDir: "/",
 		QemuArgs:  "",
-		NicModel:  ",model=e1000",
+		NicModel:  "", // ",model=e1000"
 	},
 	"netbsd/amd64": {
 		Qemu:      "qemu-system-x86_64",
