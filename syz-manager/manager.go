@@ -671,7 +671,7 @@ func (mgr *Manager) saveCrash(crash *Crash) bool {
 const maxReproAttempts = 3
 
 func (mgr *Manager) needLocalRepro(crash *Crash) bool {
-	if !mgr.cfg.Reproduce || crash.Corrupted {
+	if !mgr.cfg.Reproduce || crash.Corrupted || mgr.checkResult == nil {
 		return false
 	}
 	if mgr.checkResult.Features[host.FeatureLeakChecking].Enabled &&
