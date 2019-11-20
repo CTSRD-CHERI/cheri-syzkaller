@@ -22,6 +22,7 @@ package prog
 import (
 	"fmt"
 	"sort"
+	"unsafe"
 )
 
 const (
@@ -220,14 +221,8 @@ func (w *execContext) write(v uint64) {
 		w.eof = true
 		return
 	}
-	w.buf[0] = byte(v >> 0)
-	w.buf[1] = byte(v >> 8)
-	w.buf[2] = byte(v >> 16)
-	w.buf[3] = byte(v >> 24)
-	w.buf[4] = byte(v >> 32)
-	w.buf[5] = byte(v >> 40)
-	w.buf[6] = byte(v >> 48)
-	w.buf[7] = byte(v >> 56)
+
+	*(*uint64)(unsafe.Pointer(&w.buf[0])) = v
 	w.buf = w.buf[8:]
 }
 
