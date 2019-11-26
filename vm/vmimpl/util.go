@@ -70,7 +70,7 @@ func sshArgs(debug bool, sshKey, portArg string, port int) []string {
 		"-o", "BatchMode=yes",
 		"-o", "IdentitiesOnly=yes",
 		"-o", "StrictHostKeyChecking=no",
-		"-o", "ConnectTimeout=60",
+		"-o", "ConnectTimeout=120",
 	}
 	if sshKey != "" {
 		args = append(args, "-i", sshKey)
