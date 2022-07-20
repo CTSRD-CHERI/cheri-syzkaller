@@ -340,10 +340,7 @@ var List = map[string]map[string]*Target{
 			PageSize:       4 << 10,
 			LittleEndian:   true,
 			CCompiler:      "/home/zalan/cheri/output/morello-sdk/bin/clang",
-			CFlags:		[]string{
-				"-target", "aarch64-unknown-freebsd14.0",
-				"--sysroot", "/usr/home/zalan/cheri/output/rootfs-morello-purecap",
-			},
+			CFlags:         freebsdCFlags(ARM64, "aarch64"),
 			NeedSyscallDefine: func(nr uint64) bool {
 				// freebsd_12_shm_open, shm_open2, shm_rename, __realpathat, close_range, copy_file_range
 				return nr == 482 || nr >= 569
@@ -618,6 +615,15 @@ func fuchsiaCFlags(arch, clangArch string) []string {
 		"-I", out + "/fidling/gen/zircon/vdso/zx",
 		"-L", out + "/" + arch + "-shared",
 	}
+}
+
+func freebsdCFlags(arch, clangArch string) []string {
+	var env_cflags []string
+	extra_cflags := os.Getenv("CFLAGS")
+	if extra_cflags != "" {
+		env_cflags = strings.Split(extra_cflags, " ")
+	}
+	return env_cflags
 }
 
 func init() {
