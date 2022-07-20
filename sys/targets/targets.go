@@ -335,10 +335,7 @@ var List = map[string]map[string]*Target{
 			PageSize:       4 << 10,
 			LittleEndian:   true,
 			CCompiler:      "clang",
-			CFlags:		[]string{
-				"-target", "aarch64-unknown-freebsd14.0",
-				"--sysroot", "/home/at718/cheri/build/freebsd-aarch64-build/usr/home/at718/cheri/freebsd/arm64.aarch64/tmp",
-			},
+			CFlags:         freebsdCFlags(ARM64, "aarch64"),
 		},
 	},
 	NetBSD: {
@@ -543,6 +540,15 @@ func fuchsiaCFlags(arch, clangArch string) []string {
 		"-I", out + "/fidling/gen/zircon/vdso/zx",
 		"-L", out + "/" + arch + "-shared",
 	}
+}
+
+func freebsdCFlags(arch, clangArch string) []string {
+	var env_cflags []string
+	extra_cflags := os.Getenv("CFLAGS")
+	if extra_cflags != "" {
+		env_cflags = strings.Split(extra_cflags, " ")
+	}
+	return env_cflags
 }
 
 func init() {
