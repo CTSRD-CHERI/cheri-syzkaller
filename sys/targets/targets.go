@@ -446,6 +446,7 @@ var oses = map[string]osCommon{
 		cflags:                 []string{"-static"},
 	},
 	FreeBSD: {
+		BuildOS:                Linux,
 		SyscallNumbers:         true,
 		Int64SyscallArgs:       true,
 		SyscallPrefix:          "SYS_",
