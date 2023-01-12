@@ -7,8 +7,8 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"time"
 	"strings"
+	"time"
 
 	"github.com/google/syzkaller/pkg/config"
 	"github.com/google/syzkaller/pkg/log"
@@ -25,7 +25,7 @@ func init() {
 type Config struct {
 	MorelloBoxAddress  string `json:"mbox_address"`
 	MorelloBoxUserName string `json:"mbox_username"`
-	MorelloBoxSSHPort  int `json:"mbox_port"`
+	MorelloBoxSSHPort  int    `json:"mbox_port"`
 	MorelloBoxSSHKey   string `json:"mbox_sshkey"`
 	MorelloBoxWorkDir  string `json:"mbox_workdir"`
 	RebootCommand      string `json:"reboot_command"`
@@ -45,16 +45,16 @@ type machine struct {
 }
 
 type instance struct {
-	cfg            *Config
-	closed         chan bool
-	debug          bool
-	workdir        string
-	os             string
-	timeouts       targets.Timeouts
-	merger         *vmimpl.OutputMerger
-	writePipe      io.WriteCloser
-	rpipe          io.ReadCloser
-	morellobox     machine
+	cfg        *Config
+	closed     chan bool
+	debug      bool
+	workdir    string
+	os         string
+	timeouts   targets.Timeouts
+	merger     *vmimpl.OutputMerger
+	writePipe  io.WriteCloser
+	rpipe      io.ReadCloser
+	morellobox machine
 }
 
 func ctor(env *vmimpl.Env) (vmimpl.Pool, error) {
@@ -72,7 +72,7 @@ func ctor(env *vmimpl.Env) (vmimpl.Pool, error) {
 	if cfg.MorelloBoxWorkDir == "" {
 		return nil, fmt.Errorf("config param morello box working directory is empty")
 	}
-	
+
 	if cfg.MorelloBoxSSHPort == 0 {
 		cfg.MorelloBoxSSHPort = 22
 	}
@@ -96,12 +96,12 @@ func (pool *Pool) Count() int {
 
 func (pool *Pool) Create(workdir string, index int) (vmimpl.Instance, error) {
 	inst := &instance{
-		closed:      make(chan bool),
-		cfg:         pool.cfg,
-		debug:       pool.env.Debug,
-		timeouts:    pool.env.Timeouts,
-		os:          pool.env.OS,
-		workdir:     workdir,
+		closed:   make(chan bool),
+		cfg:      pool.cfg,
+		debug:    pool.env.Debug,
+		timeouts: pool.env.Timeouts,
+		os:       pool.env.OS,
+		workdir:  workdir,
 	}
 	inst.morellobox = machine{
 		sshuser:        inst.cfg.MorelloBoxUserName,
@@ -130,26 +130,26 @@ func (pool *Pool) Create(workdir string, index int) (vmimpl.Instance, error) {
 	return inst, nil
 }
 
-func (inst *instance) start_morellobox() (error){
+func (inst *instance) start_morellobox() error {
 	args := strings.Split(inst.cfg.RebootCommand, " ")
- 	if inst.debug {
-                log.Logf(0, "running run command:%#v", args)
-        }
+	if inst.debug {
+		log.Logf(0, "running run command:%#v", args)
+	}
 	args = append(args, "")
-        _, err := osutil.RunCmd(90*time.Second, "", args[0], args[1:]...)
-	if err != nil{
+	_, err := osutil.RunCmd(90*time.Second, "", args[0], args[1:]...)
+	if err != nil {
 		if inst.debug {
 			log.Logf(0, "running reboot command failed:%v", err)
 		}
 	}
-	if err:=inst.waitForSSH(3*time.Minute, inst.morellobox); err == nil {
+	if err := inst.waitForSSH(3*time.Minute, inst.morellobox); err == nil {
 		return nil
 	}
 	return fmt.Errorf("Couldn't reboot")
-	
+
 }
 
-func (inst *instance) isClosed() (bool){//TODO: delete if not needed
+func (inst *instance) isClosed() bool { //TODO: delete if not needed
 	select {
 	case <-inst.closed:
 		return true
@@ -158,22 +158,22 @@ func (inst *instance) isClosed() (bool){//TODO: delete if not needed
 	}
 }
 
-func (inst *instance) runCommand(command string, target machine, timeout time.Duration) (error){
+func (inst *instance) runCommand(command string, target machine, timeout time.Duration) error {
 	sshArgs := vmimpl.SSHArgs(inst.debug, target.sshkey, target.sshport)
 	args := append([]string{"ssh"}, sshArgs...)
-        args = append(args, target.fullAddress(), command)
+	args = append(args, target.fullAddress(), command)
 	if inst.debug {
 		log.Logf(0, "running run command:%#v", args)
-        }
+	}
 	_, err := osutil.RunCmd(timeout, "", args[0], args[1:]...)
-        return err
+	return err
 }
 
-func (target machine)fullAddress()(string){
-        return target.sshuser + "@" + target.address
+func (target machine) fullAddress() string {
+	return target.sshuser + "@" + target.address
 }
 
-func (inst *instance) waitForSSH(timeout time.Duration, target machine)(error){
+func (inst *instance) waitForSSH(timeout time.Duration, target machine) error {
 	if inst.debug {
 		log.Logf(0, "Starting waiting for ssh, with target:%v", target.address)
 	}
@@ -187,14 +187,14 @@ func (inst *instance) Forward(port int) (string, error) {
 		return "", fmt.Errorf("forward port is zero")
 	}
 	if inst.morellobox.forwardingPort != 0 {
-		return "",fmt.Errorf("forward port is already set")
+		return "", fmt.Errorf("forward port is already set")
 	}
-	inst.morellobox.forwardingPort = port	
+	inst.morellobox.forwardingPort = port
 	return fmt.Sprintf("localhost:%v", port), nil
 }
 
-func (inst *instance)startDiagnose(){
-	
+func (inst *instance) startDiagnose() {
+
 }
 
 func (inst *instance) Diagnose(rep *report.Report) ([]byte, bool) {
@@ -221,7 +221,7 @@ func (inst *instance) Copy(hostSrc string) (string, error) {
 	basePath := filepath.Base(hostSrc)
 	vmDst := filepath.Join(inst.cfg.MorelloBoxWorkDir, basePath)
 	args := append(vmimpl.SCPArgs(inst.debug, inst.morellobox.sshkey, inst.morellobox.sshport), hostSrc,
-		inst.morellobox.fullAddress() + ":" + vmDst)
+		inst.morellobox.fullAddress()+":"+vmDst)
 	if inst.debug {
 		log.Logf(0, "running command: scp %#v", args)
 	}
@@ -244,14 +244,14 @@ func (inst *instance) Run(timeout time.Duration, stop <-chan bool, command strin
 
 	//Needed while CTSRD-CHERI/cheribsd-ports/issues/9 is not fixed
 	command = "env GODEBUG=asyncpreemptoff=1 " + command
-	
+
 	command = "sudo " + command
 	command = "cd " + inst.cfg.MorelloBoxWorkDir + " ;" + command
-	
+
 	sshArgs := vmimpl.SSHArgsForward(inst.debug, inst.morellobox.sshkey, inst.morellobox.sshport, inst.morellobox.forwardingPort)
 	args := append([]string{"ssh"}, sshArgs...)
 	args = append(args, inst.morellobox.fullAddress(), command)
-	
+
 	if inst.debug {
 		log.Logf(0, "running command:%#v", args)
 	}
@@ -264,7 +264,7 @@ func (inst *instance) Run(timeout time.Duration, stop <-chan bool, command strin
 		return nil, nil, err
 	}
 	wpipe.Close()
-	
+
 	errc := make(chan error, 1)
 	signal := func(err error) {
 		select {
@@ -273,7 +273,7 @@ func (inst *instance) Run(timeout time.Duration, stop <-chan bool, command strin
 		}
 	}
 
-	go func(){
+	go func() {
 		select {
 		case <-time.After(timeout):
 			signal(vmimpl.ErrTimeout)
@@ -281,9 +281,9 @@ func (inst *instance) Run(timeout time.Duration, stop <-chan bool, command strin
 			signal(vmimpl.ErrTimeout)
 		case err := <-inst.merger.Err:
 			cmd.Process.Kill()
-			if cmdErr := cmd.Wait(); cmdErr == nil{
+			if cmdErr := cmd.Wait(); cmdErr == nil {
 				// If the command exited successfully, we got EOF error from merger.
-                                // But in this case no error has happened and the EOF is expected.
+				// But in this case no error has happened and the EOF is expected.
 				err = nil
 			}
 			signal(err)
