@@ -339,9 +339,8 @@ var List = map[string]map[string]*Target{
 			PtrSize:      8,
 			PageSize:     4 << 10,
 			LittleEndian: true,
-			CCompiler:    "/home/zalan/cheri/output/morello-sdk/bin/clang",
-			//CFlags:         freebsdCFlags(ARM64, "aarch64"),
-			CFlags: []string{"-target", "aarch64-unknown-freebsd13", "--sysroot=/home/zalan/cheri/output/rootfs-morello-purecap", "-B/home/zalan/cheri/output/morello-sdk/bin", "-mcpu=rainier", "-march=morello", "-mabi=aapcs", "-Xclang", "-morello-vararg=new", "-Wno-error=unused-command-line-argument", "-Werror=implicit-function-declaration", "-Werror=format", "-Werror=incompatible-pointer-types", "-Werror=cheri-capability-misuse", "-Werror=cheri-bitwise-operations", "-Werror=cheri-prototypes", "-Werror=pass-failed", "-Werror=undefined-internal", "-L/home/zalan/cheri/output/rootfs-morello-purecap/usr/lib64", "-target", "aarch64-unknown-freebsd13", "--sysroot=/home/zalan/cheri/output/rootfs-morello-purecap", "-B/home/zalan/cheri/output/morello-sdk/bin", "-mcpu=rainier", "-march=morello", "-mabi=aapcs", "-Xclang", "-morello-vararg=new", "-fuse-ld=lld", "--ld-path=/home/zalan/cheri/output/morello-sdk/bin/ld.lld"},
+			CCompiler:    "clang",
+			CFlags:         freebsdCFlags(ARM64, "aarch64"),
 			NeedSyscallDefine: func(nr uint64) bool {
 				// freebsd_12_shm_open, shm_open2, shm_rename, __realpathat, close_range, copy_file_range
 				return nr == 482 || nr >= 569
